@@ -16,12 +16,12 @@ export class AppComponent {
   picUrl: string = '';
   ws: $Websocket;
   constructor() {
-    this.ws = new $WebSocket("ws://localhost:8080/api/photo");
+    this.ws = new $WebSocket("ws://localhost:8080/api/ws");
   }
 
   subscribe($event) {
     console.log("trying to subscribe to ws");
-    this.ws = new $WebSocket("ws://localhost:8080/api/photo");
+    this.ws = new $WebSocket("ws://localhost:8080/api/ws");
     this.ws.send("Hello");
     this.ws.getDataStream().subscribe(
       res => {

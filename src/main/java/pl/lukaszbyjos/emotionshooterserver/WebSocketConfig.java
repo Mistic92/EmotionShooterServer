@@ -17,9 +17,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
     private PhotoChangeHandler photoChangeHandler;
 
     @Override
-
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(photoChangeHandler, "/photo");
-
+        registry.addHandler(photoChangeHandler, "/ws");
     }
+
 }

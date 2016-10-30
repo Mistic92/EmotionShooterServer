@@ -9,7 +9,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-@RequestMapping("/photo/")
+@RequestMapping("/photo")
 public interface PhotoController {
 
     @RequestMapping(value = "", method = RequestMethod.POST)

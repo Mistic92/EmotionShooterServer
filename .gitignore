@@ -12,7 +12,7 @@ google-services.json
 
 # User-specific stuff:
 .idea/
-
+/classes
 # Mongo Explorer plugin:
 .idea/mongoSettings.xml
 
