@@ -1,0 +1,42 @@
+buildscript {
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.1.RELEASE")
+        classpath 'com.google.appengine:gradle-appengine-plugin:1.9.42'
+    }
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+
+}
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'spring-boot'
+apply plugin: 'appengine'
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web:1.4.1.RELEASE")
+
+    compile group: 'org.springframework', name: 'spring-websocket', version: '4.3.3.RELEASE'
+    compile group: 'org.springframework', name: 'spring-messaging', version: '4.3.3.RELEASE'
+
+    compile 'ch.qos.logback:logback-classic:1.1.7'
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.16.10'
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.1")
+    compile 'com.google.apis:google-api-services-vision:v1-rev26-1.22.0'
+    compile 'io.reactivex:rxjava:1.2.1'
+    compile 'org.slf4j:slf4j-api:1.7.21'
+
+    testCompile 'junit:junit:4.12'
+}
+
+
+bootRun.doFirst {
+    println("Setting env variable")
+    environment 'GOOGLE_APPLICATION_CREDENTIALS', 'google-services.json'
+}

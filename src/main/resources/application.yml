@@ -1,0 +1,16 @@
+server:
+  port: 8080
+  context-path: /api
+
+  tomcat:
+    accesslog:
+      directory: logs
+      enabled: true
+      pattern: common
+      prefix: access_log
+logging:
+  level:
+    root: INFO
+    org:
+      springframework:
+        web: INFO
