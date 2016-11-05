@@ -1,35 +1,25 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Angular 2 QuickStart</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="styles.css">
-
-    <!-- 1. Load libraries -->
-     <!-- Polyfill(s) for older browsers -->
-    <script src="https://unpkg.com/core-js/client/shim.min.js"></script>
-
-    <script src="https://unpkg.com/zone.js@0.6.23?main=browser"></script>
-    <script src="https://unpkg.com/reflect-metadata@0.1.8"></script>
-    <script src="https://unpkg.com/systemjs@0.19.27/dist/system.src.js"></script>
-
-    <!-- 2. Configure SystemJS -->
-    <script src="systemjs.config.js"></script>
-    <script>
-      System.import('app').catch(function(err){ console.error(err); });
-    </script>
+      <title>EmotionShooterUI</title>
+      <link href="style.css" rel="stylesheet">
   </head>
-
-  <!-- 3. Display the application -->
   <body>
-    <my-app>Loading...</my-app>
+    <canvas id="background"></canvas>
+    <div id="info">
+      <div id="photo-container">
+        <img src="" id="photo">
+      </div>
+      <div id="info-container">
+        
+      </div>
+    </div>
+    <div id="loader">Loading...</div>
+
+    <script src="char.js"></script>
+    <script src="data-view.js"></script>
+    <script src="background.js"></script>
+    <script src="websocket.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>
-
-
-<!--
-Copyright 2016 Google Inc. All Rights Reserved.
-Use of this source code is governed by an MIT-style license that
-can be found in the LICENSE file at http://angular.io/license
--->

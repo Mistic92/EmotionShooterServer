@@ -35,6 +35,12 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+appengine {
+    deploy {   // deploy configuration
+        stopPreviousVersion = true  // default - stop the current version
+        promote = true              // default - & make this the current version
+    }
+}
 
 bootRun.doFirst {
     println("Setting env variable")

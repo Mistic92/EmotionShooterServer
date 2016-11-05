@@ -1,6 +1,5 @@
 package pl.lukaszbyjos.emotionshooterserver.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -18,6 +17,7 @@ import rx.Observable;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -45,7 +45,7 @@ public class VisionServiceImpl implements VisionService {
                             .setFeatures(ImmutableList.of(
                                     new Feature()
                                             .setType("FACE_DETECTION")
-                                            .setMaxResults(1)));
+                                            .setMaxResults(5)));
             AnnotateImageResponse response = null;
             try {
                 Vision.Images.Annotate annotate =
@@ -63,8 +63,8 @@ public class VisionServiceImpl implements VisionService {
                                     ? response.getError().getMessage()
                                     : "Unknown error getting image annotations");
                 } else {
-                    FaceAnnotation faceAnnotation = response.getFaceAnnotations().get(0);
-                    return new ObjectMapper().readValue(faceAnnotation.toString(), VisionResponse.class);
+                    List<FaceAnnotation> faceAnnotation = response.getFaceAnnotations();
+                    return VisionResponse.builder().annotationList(faceAnnotation).build();
                 }
             } catch (IOException e) {
                 log.error(e.getLocalizedMessage(), e);

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.lukaszbyjos.emotionshooterserver.controler.PhotoController;
+import pl.lukaszbyjos.emotionshooterserver.domain.NewPhotoInfo;
 import pl.lukaszbyjos.emotionshooterserver.service.StorageService;
 import pl.lukaszbyjos.emotionshooterserver.service.VisionService;
 import pl.lukaszbyjos.emotionshooterserver.websocket.PhotoChangeHandler;
@@ -43,11 +44,11 @@ public class PhotoControllerImpl implements PhotoController {
                                  HttpServletRequest request) throws IOException {
         log.info("Get file with name: " + file.getOriginalFilename());
         if (!file.isEmpty()) {
-            photoChangeHandler.sendProcessingInfo();
             final String fileName = storageService.store(file);
             if (baseUrl == null)
                 baseUrl = String.format("%s://%s:%d/api/photo/", request.getScheme(), request.getServerName(), request.getServerPort());
             final String fileDownloadUrl = baseUrl + fileName;
+            photoChangeHandler.sendProcessingInfo(NewPhotoInfo.builder().photoUrl(fileDownloadUrl).build());
             visionService.getPhotoData(file.getBytes())
                     .subscribeOn(Schedulers.io())
                     .subscribe(visionResponse -> {

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import pl.lukaszbyjos.emotionshooterserver.domain.NewPhotoInfo;
 import pl.lukaszbyjos.emotionshooterserver.domain.VisionResponse;
 
 import javax.annotation.PostConstruct;
@@ -21,13 +22,13 @@ public class PhotoChangeHandler extends TextWebSocketHandler {
     }
 
     // This will send only to one client(most recently connected)
-    public void sendProcessingInfo() {
+    public void sendProcessingInfo(NewPhotoInfo newPhotoInfo) {
         System.out.println("Trying to send processing info...");
         if (session != null && session.isOpen()) {
             try {
                 System.out.println("Sending processing info");
                 session.sendMessage(new TextMessage(
-                        objectMapper.writeValueAsString(ProcessingInfo.builder().processing(true).build())));
+                        objectMapper.writeValueAsString(newPhotoInfo)));
             } catch (Exception e) {
                 e.printStackTrace();
             }
