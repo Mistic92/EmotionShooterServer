@@ -17,7 +17,17 @@ repositories {
 apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'spring-boot'
-apply plugin: 'appengine'
+apply plugin: 'application'
+
+mainClassName = "pl.lukaszbyjos.emotionshooterserver.EmotionShooterApp"
+
+distZip {
+    into(project.name) {
+        from '.'
+        include 'google-services.json'
+        into project.name + '/bin'
+    }
+}
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web:1.4.1.RELEASE")
@@ -33,13 +43,6 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.21'
 
     testCompile 'junit:junit:4.12'
-}
-
-appengine {
-    deploy {   // deploy configuration
-        stopPreviousVersion = true  // default - stop the current version
-        promote = true              // default - & make this the current version
-    }
 }
 
 bootRun.doFirst {

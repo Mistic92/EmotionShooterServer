@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.lukaszbyjos.emotionshooterserver.controler.PhotoController;
 import pl.lukaszbyjos.emotionshooterserver.domain.NewPhotoInfo;
+import pl.lukaszbyjos.emotionshooterserver.service.ResponsesBackupService;
 import pl.lukaszbyjos.emotionshooterserver.service.StorageService;
 import pl.lukaszbyjos.emotionshooterserver.service.VisionService;
 import pl.lukaszbyjos.emotionshooterserver.websocket.PhotoChangeHandler;
@@ -34,6 +35,8 @@ public class PhotoControllerImpl implements PhotoController {
     private HttpServletRequest request;
     @Autowired
     private PhotoChangeHandler photoChangeHandler;
+    @Autowired
+    private ResponsesBackupService responsesBackupService;
 
     private String baseUrl;
 
@@ -52,9 +55,10 @@ public class PhotoControllerImpl implements PhotoController {
             visionService.getPhotoData(file.getBytes())
                     .subscribeOn(Schedulers.io())
                     .subscribe(visionResponse -> {
-                        visionResponse.setPhotoUrl(fileDownloadUrl);
                         log.info("Vision photoUrl: " + visionResponse.toString());
                         photoChangeHandler.sendNewPhotoData(visionResponse);
+                        visionResponse.setPhotoUrl(fileDownloadUrl);
+                        responsesBackupService.saveResponse(visionResponse);
                     });
         }
     }
