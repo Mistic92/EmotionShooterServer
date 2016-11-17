@@ -10,6 +10,7 @@ import com.google.api.services.vision.v1.model.*;
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.lukaszbyjos.emotionshooterserver.domain.EmotionStatus;
 import pl.lukaszbyjos.emotionshooterserver.domain.VisionResponse;
 import pl.lukaszbyjos.emotionshooterserver.service.VisionService;
 import rx.Observable;
@@ -17,6 +18,8 @@ import rx.Observable;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -82,6 +85,8 @@ public class VisionServiceImpl implements VisionService {
                 .setApplicationName("emotionshooter-147916")
                 .build();
     }
+
+
 
 }
 

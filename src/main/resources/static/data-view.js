@@ -23,13 +23,13 @@ window.DataViewService = (function () {
     dataViewService.prototype.buildInfo = function (data) {
     	var info = "";
 
-    	info += '<div class="info-title">angerLikelihood:</div><div class="info-data">' + data.angerLikelihood + '</div>';
-    	info += '<div class="info-title">blurredLikelihood:</div><div class="info-data">' + data.blurredLikelihood + '</div>';
-    	info += '<div class="info-title">headwearLikelihood:</div><div class="info-data">' + data.headwearLikelihood + '</div>';
-    	info += '<div class="info-title">joyLikelihood:</div><div class="info-data">' + data.joyLikelihood + '</div>';
-    	info += '<div class="info-title">sorrowLikelihood:</div><div class="info-data">' + data.sorrowLikelihood + '</div>';
-    	info += '<div class="info-title">surpriseLikelihood:</div><div class="info-data">' + data.surpriseLikelihood + '</div>';
-    	info += '<div class="info-title">underExposedLikelihood:</div><div class="info-data">' + data.underExposedLikelihood + '</div>';
+    	info += '<div class="info-title">Zlosc:</div><div class="info-data">' + data.angerLikelihood + '</div>';
+    	// info += '<div class="info-title">Roz:</div><div class="info-data">' + data.blurredLikelihood + '</div>';
+    	info += '<div class="info-title">Nakrycie glowy:</div><div class="info-data">' + data.headwearLikelihood + '</div>';
+    	info += '<div class="info-title">Radosc:</div><div class="info-data">' + data.joyLikelihood + '</div>';
+    	info += '<div class="info-title">Zatroskanie:</div><div class="info-data">' + data.sorrowLikelihood + '</div>';
+    	info += '<div class="info-title">Zaskoczenie:</div><div class="info-data">' + data.surpriseLikelihood + '</div>';
+    	// info += '<div class="info-title">underExposedLikelihood:</div><div class="info-data">' + data.underExposedLikelihood + '</div>';
 
     	return info;
 
