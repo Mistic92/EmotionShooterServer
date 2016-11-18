@@ -20,7 +20,8 @@ google-services.json
 *.iws
 
 ## Plugin-specific files:
-
+upload-dir/
+backup.json
 # IntelliJ
 /out/
 
