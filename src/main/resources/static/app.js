@@ -21,7 +21,7 @@
 			BackgroundService.stop();
     	}, 10000);
     	setTimeout(function () {
-			DataViewService.setInfo(data.annotationList[0]);
+			DataViewService.setInfo(data);
     	}, 16000);
     });
 
@@ -40,7 +40,7 @@
   //   setTimeout(function () {
   //   	WebsocketService.connection.send(JSON.stringify({
  
-  // "annotationList": [
+  // "faceAnnotation": [
   //   {
   //     "angerLikelihood": "UNLIKELY",
   //     "blurredLikelihood": "VERY_UNLIKELY",

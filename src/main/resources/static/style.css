@@ -116,6 +116,14 @@ body {
     opacity: 0;
 }
 
+#text-container {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+}
+
 #info.visible {
     opacity: 1;
     top: 50%;
@@ -162,7 +170,7 @@ body {
 #info #info-container .info-title {
     float: left;
     width: 50%;
-    padding: 41px 0px 40px 30px;
+    padding: 51px 0px 50px 30px;
     text-align: left;
     font-weight: bold;
     border-bottom: 1px solid #DDDDDD;
@@ -172,8 +180,33 @@ body {
 #info #info-container .info-data {
     float: left;
     width: 50%;
-    padding: 41px 30px 40px 30px;
+    padding: 51px 30px 50px 30px;
     text-align: center;
     border-bottom: 1px solid #DDDDDD;
     margin: 0px 0px -1px 0px;
+}
+
+progress[value] {
+    /* Reset the default appearance */
+    -webkit-appearance: none;
+    appearance: none;
+
+    width: 200px;
+    height: 15px;
+}
+
+progress[value]::-webkit-progress-bar {
+    background-color: #eee;
+    border-radius: 2px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+    -webkit-animation: animate-stripes 5s linear infinite;
+    animation: animate-stripes 5s linear infinite;
+}
+
+@-webkit-keyframes animate-stripes {
+    100% { background-position: -100px 0px; }
+}
+
+@keyframes animate-stripes {
+    100% { background-position: -100px 0px; }
 }

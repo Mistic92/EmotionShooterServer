@@ -1,21 +1,22 @@
 package pl.lukaszbyjos.emotionshooterserver.domain;
 
-public enum EmotionStatus {
-    UNKNOWN("Nieznane"),
-    VERY_UNLIKELY("Bardzo nieprawdopodobne"),
-    UNLIKELY("Nieprawdopodobne"),
-    POSSIBLE("Możliwe"),
-    LIKELY("Prawdopodobny"),
-    VERY_LIKELY("Bardzo prawdopodobne");
+import lombok.*;
 
-    private final String translation;
+@EqualsAndHashCode
+@NoArgsConstructor
+@Builder
+@AllArgsConstructor
+@Data
+public class EmotionStatus {
+    private EmotionName name;
+    private int level;
 
-    EmotionStatus(String translation) {
-        this.translation = translation;
+    public String getName() {
+        return name.getName();
     }
 
-    public String getTranslation() {
-        return translation;
+    public EmotionName getEmotionName() {
+        return name;
     }
 }
 

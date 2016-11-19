@@ -16,7 +16,7 @@ window.WebsocketService = (function () {
             var data = JSON.parse(evt.data);
             if(data.photoUrl) {
                 this.event(this.EVENT.PHOTO, data);
-            } else if(data.annotationList) {
+            } else if(data.faceAnnotation) {
                 this.event(this.EVENT.INFO, data);
             }
         }.bind(this);

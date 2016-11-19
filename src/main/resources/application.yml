@@ -18,3 +18,5 @@ logging:
     org:
       springframework:
         web: INFO
+vision:
+  enabled: true
