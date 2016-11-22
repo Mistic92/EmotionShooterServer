@@ -19,4 +19,4 @@ logging:
       springframework:
         web: INFO
 vision:
-  enabled: false
+  enabled: true
