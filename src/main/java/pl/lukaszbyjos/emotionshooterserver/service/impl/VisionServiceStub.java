@@ -1,6 +1,8 @@
 package pl.lukaszbyjos.emotionshooterserver.service.impl;
 
+import com.google.api.services.vision.v1.model.BoundingPoly;
 import com.google.api.services.vision.v1.model.FaceAnnotation;
+import com.google.api.services.vision.v1.model.Vertex;
 import pl.lukaszbyjos.emotionshooterserver.domain.EmotionName;
 import pl.lukaszbyjos.emotionshooterserver.domain.EmotionStatus;
 import pl.lukaszbyjos.emotionshooterserver.domain.VisionResponse;
@@ -30,15 +32,34 @@ public class VisionServiceStub implements VisionService {
                 .builder()
                 .name(EmotionName.SUPRISE)
                 .level(4).build();
-
+        FaceAnnotation faceAnnotation = new FaceAnnotation();
+        BoundingPoly boundingPoly = new BoundingPoly();
+        Vertex v1 = new Vertex();
+        v1.setX(229);
+        v1.setY(417);
+        Vertex v2 = new Vertex();
+        v2.setX(798);
+        v2.setY(417);
+        Vertex v3 = new Vertex();
+        v3.setX(798);
+        v3.setY(986);
+        Vertex v4 = new Vertex();
+        v4.setX(229);
+        v4.setY(986);
+        boundingPoly.setVertices(Arrays.asList(v1, v2, v3, v4));
+        faceAnnotation.setBoundingPoly(boundingPoly);
+        faceAnnotation.setFdBoundingPoly(boundingPoly);
 
         return Observable.just(VisionResponse.builder()
                 .emotionsList(Arrays.asList(anger, joy, sorrow, suprise))
                 .headwear(3)
-                .faceAnnotation(new FaceAnnotation().setAngerLikelihood("NOPE"))
+                .faceAnnotation(new FaceAnnotation()
+                        .setAngerLikelihood("NOPE")
+                        .setBoundingPoly(boundingPoly)
+                        .setFdBoundingPoly(boundingPoly))
                 .blur(1)
                 .build())
-                .delay(2, TimeUnit.SECONDS);
+                .delay(1, TimeUnit.SECONDS);
     }
 }
 

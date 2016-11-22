@@ -1,7 +1,13 @@
 package pl.lukaszbyjos.emotionshooterserver;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @ConfigurationProperties("storage")
 public class StorageProperties {
 

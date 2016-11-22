@@ -12,11 +12,11 @@
     WebsocketService.connect('ws://localhost:8080/api/ws');
 
     WebsocketService.on(WebsocketService.EVENT.PHOTO, function (data) {
-       	DataViewService.setImage(data.photoUrl);
         BackgroundService.start();
     });
 
     WebsocketService.on(WebsocketService.EVENT.INFO, function (data) {
+        DataViewService.setImage(data.photoUrl);
     	setTimeout(function () {
 			BackgroundService.stop();
     	}, 10000);

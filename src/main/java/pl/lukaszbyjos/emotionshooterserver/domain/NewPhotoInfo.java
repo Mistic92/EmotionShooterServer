@@ -10,5 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 public class NewPhotoInfo {
     private String photoUrl;
+    private boolean processing;
 }
 

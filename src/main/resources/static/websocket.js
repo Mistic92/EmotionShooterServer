@@ -14,7 +14,7 @@ window.WebsocketService = (function () {
         this.connection = new WebSocket(url);
         this.connection.onmessage = function(evt) {
             var data = JSON.parse(evt.data);
-            if(data.photoUrl) {
+            if(data.processing) {
                 this.event(this.EVENT.PHOTO, data);
             } else if(data.faceAnnotation) {
                 this.event(this.EVENT.INFO, data);

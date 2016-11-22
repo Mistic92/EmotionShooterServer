@@ -11,10 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.lukaszbyjos.emotionshooterserver.controler.PhotoController;
 import pl.lukaszbyjos.emotionshooterserver.domain.NewPhotoInfo;
-import pl.lukaszbyjos.emotionshooterserver.service.FunnyTextService;
-import pl.lukaszbyjos.emotionshooterserver.service.ResponsesBackupService;
-import pl.lukaszbyjos.emotionshooterserver.service.StorageService;
-import pl.lukaszbyjos.emotionshooterserver.service.VisionService;
+import pl.lukaszbyjos.emotionshooterserver.service.*;
 import pl.lukaszbyjos.emotionshooterserver.websocket.PhotoChangeHandler;
 import rx.schedulers.Schedulers;
 
@@ -40,6 +37,8 @@ public class PhotoControllerImpl implements PhotoController {
     private ResponsesBackupService responsesBackupService;
     @Autowired
     private FunnyTextService funnyTextService;
+    @Autowired
+    private ImageDrawService imageDrawService;
 
     private String baseUrl;
 
@@ -53,15 +52,17 @@ public class PhotoControllerImpl implements PhotoController {
             final String fileName = storageService.store(file);
             if (baseUrl == null)
                 baseUrl = String.format("%s://%s:%d/api/photo/", request.getScheme(), request.getServerName(), request.getServerPort());
-            final String fileDownloadUrl = baseUrl + fileName;
-            photoChangeHandler.sendProcessingInfo(NewPhotoInfo.builder().photoUrl(fileDownloadUrl).build());
+            photoChangeHandler.sendProcessingInfo(NewPhotoInfo.builder().processing(true).build());
             visionService.getPhotoData(file.getBytes())
                     .subscribeOn(Schedulers.io())
                     .subscribe(visionResponse -> {
+                        String newFileName = fileName.substring(0, fileName.lastIndexOf(".jpg")) + "_fun.jpg";
+                        final String fileDownloadUrl = baseUrl + newFileName;
+                        visionResponse.setPhotoUrl(fileDownloadUrl);
 //                        visionResponse.setFunText(funnyTextService.getFunnyText(visionResponse));
+                        imageDrawService.createColorfullImage(visionResponse, storageService.load(fileName));
                         photoChangeHandler.sendNewPhotoData(visionResponse);
                         log.info("Vision photoUrl: " + visionResponse.toString());
-                        visionResponse.setPhotoUrl(fileDownloadUrl);
                         responsesBackupService.saveResponse(visionResponse);
                     });
         }

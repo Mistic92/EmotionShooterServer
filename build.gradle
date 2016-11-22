@@ -32,8 +32,9 @@ distZip {
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web:1.4.1.RELEASE")
 
-    compile group: 'org.springframework', name: 'spring-websocket', version: '4.3.3.RELEASE'
-    compile group: 'org.springframework', name: 'spring-messaging', version: '4.3.3.RELEASE'
+    compile group: 'org.springframework', name: 'spring-websocket', version: '4.3.4.RELEASE'
+    compile group: 'org.springframework', name: 'spring-messaging', version: '4.3.4.RELEASE'
+    compile group: 'org.springframework', name: 'spring-test', version: '4.3.4.RELEASE'
 
     compile 'ch.qos.logback:logback-classic:1.1.7'
     compile group: 'org.projectlombok', name: 'lombok', version: '1.16.10'
