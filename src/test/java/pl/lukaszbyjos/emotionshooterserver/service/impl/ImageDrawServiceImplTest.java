@@ -1,8 +1,6 @@
 package pl.lukaszbyjos.emotionshooterserver.service.impl;
 
-import com.google.api.services.vision.v1.model.BoundingPoly;
-import com.google.api.services.vision.v1.model.FaceAnnotation;
-import com.google.api.services.vision.v1.model.Vertex;
+import com.google.api.services.vision.v1.model.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +15,8 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes=TestAppContext.class,
-        loader=AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = TestAppContext.class,
+        loader = AnnotationConfigContextLoader.class)
 public class ImageDrawServiceImplTest {
 
     @Autowired
@@ -26,30 +24,39 @@ public class ImageDrawServiceImplTest {
 
     @Test
     public void createColorfullImage() throws Exception {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        byte[] buff = Files.readAllBytes(new File("testFaceAnn").toPath());
 
         FaceAnnotation faceAnnotation = new FaceAnnotation();
+
         BoundingPoly boundingPoly = new BoundingPoly();
         Vertex v1 = new Vertex();
-        v1.setX(229);
-        v1.setY(417);
+        v1.setX(427);
+        v1.setY(396);
         Vertex v2 = new Vertex();
-        v2.setX(798);
-        v2.setY(417);
+        v2.setX(1592);
+        v2.setY(396);
         Vertex v3 = new Vertex();
-        v3.setX(798);
-        v3.setY(986);
+        v3.setX(1592);
+        v3.setY(1749);
         Vertex v4 = new Vertex();
-        v4.setX(229);
-        v4.setY(986);
+        v4.setX(427);
+        v4.setY(1749);
         boundingPoly.setVertices(Arrays.asList(v1, v2, v3, v4));
         faceAnnotation.setBoundingPoly(boundingPoly);
         faceAnnotation.setFdBoundingPoly(boundingPoly);
+
+        Landmark eyes = new Landmark();
+        eyes.setType("MIDPOINT_BETWEEN_EYES");
+        eyes.setPosition(new Position().setX(1011.4305f).setY(1013.3219f).setZ(-73.071327f));
+
+        Landmark nose = new Landmark();
+        nose.setType("NOSE_TIP");
+        nose.setPosition(new Position().setX(1008.9714f).setY(1222.562f).setZ(-170.00154f));
+
+        faceAnnotation.setLandmarks(Arrays.asList(nose, eyes));
         VisionResponse visionResponse = VisionResponse.builder()
                 .faceAnnotation(faceAnnotation)
                 .build();
-        Path path = new File("H:\\ProgramowanieProjekty\\EmotionShooterServer\\upload-dir\\JPEG_20161118_091046_-12392496101811091051.jpg").toPath();
+        Path path = new File("hu.jpg").toPath();
         imageDrawService.createColorfullImage(visionResponse, path);
     }
 

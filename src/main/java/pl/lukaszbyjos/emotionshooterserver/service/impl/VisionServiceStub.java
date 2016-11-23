@@ -1,8 +1,6 @@
 package pl.lukaszbyjos.emotionshooterserver.service.impl;
 
-import com.google.api.services.vision.v1.model.BoundingPoly;
-import com.google.api.services.vision.v1.model.FaceAnnotation;
-import com.google.api.services.vision.v1.model.Vertex;
+import com.google.api.services.vision.v1.model.*;
 import pl.lukaszbyjos.emotionshooterserver.domain.EmotionName;
 import pl.lukaszbyjos.emotionshooterserver.domain.EmotionStatus;
 import pl.lukaszbyjos.emotionshooterserver.domain.VisionResponse;
@@ -32,7 +30,6 @@ public class VisionServiceStub implements VisionService {
                 .builder()
                 .name(EmotionName.SUPRISE)
                 .level(4).build();
-        FaceAnnotation faceAnnotation = new FaceAnnotation();
         BoundingPoly boundingPoly = new BoundingPoly();
         Vertex v1 = new Vertex();
         v1.setX(229);
@@ -47,8 +44,14 @@ public class VisionServiceStub implements VisionService {
         v4.setX(229);
         v4.setY(986);
         boundingPoly.setVertices(Arrays.asList(v1, v2, v3, v4));
-        faceAnnotation.setBoundingPoly(boundingPoly);
-        faceAnnotation.setFdBoundingPoly(boundingPoly);
+
+        Landmark eyes = new Landmark();
+        eyes.setType("MIDPOINT_BETWEEN_EYES");
+        eyes.setPosition(new Position().setX(1011.4305f).setY(1013.3219f).setZ(-73.071327f));
+
+        Landmark nose = new Landmark();
+        eyes.setType("NOSE_TIP");
+        eyes.setPosition(new Position().setX(1008.9714f).setY(1222.562f).setZ(-170.00154f));
 
         return Observable.just(VisionResponse.builder()
                 .emotionsList(Arrays.asList(anger, joy, sorrow, suprise))
@@ -56,7 +59,8 @@ public class VisionServiceStub implements VisionService {
                 .faceAnnotation(new FaceAnnotation()
                         .setAngerLikelihood("NOPE")
                         .setBoundingPoly(boundingPoly)
-                        .setFdBoundingPoly(boundingPoly))
+                        .setFdBoundingPoly(boundingPoly)
+                        .setLandmarks(Arrays.asList(eyes, nose)))
                 .blur(1)
                 .build())
                 .delay(1, TimeUnit.SECONDS);

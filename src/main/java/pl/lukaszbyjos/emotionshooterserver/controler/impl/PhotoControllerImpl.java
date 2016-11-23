@@ -2,6 +2,7 @@ package pl.lukaszbyjos.emotionshooterserver.controler.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +41,9 @@ public class PhotoControllerImpl implements PhotoController {
     @Autowired
     private ImageDrawService imageDrawService;
 
+    @Value("${effects.enabled}")
+    private boolean effectsEnabled;
+
     private String baseUrl;
 
 
@@ -56,11 +60,15 @@ public class PhotoControllerImpl implements PhotoController {
             visionService.getPhotoData(file.getBytes())
                     .subscribeOn(Schedulers.io())
                     .subscribe(visionResponse -> {
-                        String newFileName = fileName.substring(0, fileName.lastIndexOf(".jpg")) + "_fun.jpg";
-                        final String fileDownloadUrl = baseUrl + newFileName;
+                        String fileDownloadUrl;
+                        if (effectsEnabled) {
+                            imageDrawService.createColorfullImage(visionResponse, storageService.load(fileName));
+                            String newFileName = fileName.substring(0, fileName.lastIndexOf(".jpg")) + "_fun.jpg";
+                            fileDownloadUrl = baseUrl + newFileName;
+                        } else {
+                            fileDownloadUrl = baseUrl + fileName;
+                        }
                         visionResponse.setPhotoUrl(fileDownloadUrl);
-//                        visionResponse.setFunText(funnyTextService.getFunnyText(visionResponse));
-                        imageDrawService.createColorfullImage(visionResponse, storageService.load(fileName));
                         photoChangeHandler.sendNewPhotoData(visionResponse);
                         log.info("Vision photoUrl: " + visionResponse.toString());
                         responsesBackupService.saveResponse(visionResponse);

@@ -20,3 +20,5 @@ logging:
         web: INFO
 vision:
   enabled: true
+effects:
+  enabled : true

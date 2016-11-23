@@ -4,10 +4,13 @@ window.DataViewService = (function () {
         this.image = document.getElementById("photo");
     }
 
-    dataViewService.prototype.setImage = function (url) {
-        this.image.src = url;
+    dataViewService.prototype.showLoader = function(){
         document.getElementById("loader").className = "visible";
         document.getElementById("info").className = "";
+    }
+
+    dataViewService.prototype.setImage = function (url) {
+        this.image.src = url;
     }
 
     dataViewService.prototype.setInfo = function (data) {
@@ -16,7 +19,7 @@ window.DataViewService = (function () {
         document.getElementById("info").className = "visible";
 
         document.getElementById("info-container").innerHTML = this.buildInfo(data);
-        document.getElementById("text-container").innerHTML = this.buildFunText(data);
+        // document.getElementById("text-container").innerHTML = this.buildFunText(data);
 
         console.log(data);
 
