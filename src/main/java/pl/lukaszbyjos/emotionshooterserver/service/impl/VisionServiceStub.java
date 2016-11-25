@@ -50,8 +50,8 @@ public class VisionServiceStub implements VisionService {
         eyes.setPosition(new Position().setX(1011.4305f).setY(1013.3219f).setZ(-73.071327f));
 
         Landmark nose = new Landmark();
-        eyes.setType("NOSE_TIP");
-        eyes.setPosition(new Position().setX(1008.9714f).setY(1222.562f).setZ(-170.00154f));
+        nose.setType("NOSE_TIP");
+        nose.setPosition(new Position().setX(1008.9714f).setY(1222.562f).setZ(-170.00154f));
 
         return Observable.just(VisionResponse.builder()
                 .emotionsList(Arrays.asList(anger, joy, sorrow, suprise))

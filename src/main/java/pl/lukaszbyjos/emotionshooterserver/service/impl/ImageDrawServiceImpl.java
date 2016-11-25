@@ -5,6 +5,7 @@ import com.google.api.services.vision.v1.model.Landmark;
 import com.google.api.services.vision.v1.model.Position;
 import com.google.api.services.vision.v1.model.Vertex;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pl.lukaszbyjos.emotionshooterserver.domain.VisionResponse;
 import pl.lukaszbyjos.emotionshooterserver.service.ImageDrawService;
@@ -20,6 +21,8 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.IntStream;
 
 
 @Service
@@ -36,6 +39,10 @@ public class ImageDrawServiceImpl implements ImageDrawService {
             new Color(219, 68, 55, 100),
             new Color(244, 180, 0, 100),
             new Color(15, 157, 88, 100)};
+
+    private java.util.List<Color> colorList = Arrays.asList(gColors);
+    @Value("${effects.max-colors}")
+    private int maxColorsInGradient;
 
     @Override
     public String createColorfullImage(VisionResponse visionResponse, Path filePath) {
@@ -91,31 +98,42 @@ public class ImageDrawServiceImpl implements ImageDrawService {
         return 0;
     }
 
-
-    private Color[] shuffleColors(Color[] colorsTable) {
-        java.util.List<Color> colorList = Arrays.asList(colorsTable);
+    private Color[] shuffleColorsRadnomColors() {
         Collections.shuffle(colorList);
-        return (Color[]) colorList.toArray();
+        return colorList.stream().limit(maxColorsInGradient).toArray(Color[]::new);
     }
 
+    private float[] getFractionsForColors() {
+        switch (maxColorsInGradient) {
+            case 1:
+                return new float[]{0f};
+            case 2:
+                return new float[]{0.0f, 1f};
+            case 3:
+                return new float[]{0.0f, 0.5f, 1f};
+            case 4:
+                return new float[]{0.0f, 0.25f, 0.75f, 1.0f};
+            default:
+                return new float[]{1f};
+        }
+    }
+
+
     private void createForegraundColors(Graphics2D backGraphic, int width, int height) {
-        float fractions[] = {0.1f, 0.3f, 0.6f, 0.9f};
+        float fractions[] = getFractionsForColors();
         LinearGradientPaint linearGradientPaint =
                 new LinearGradientPaint(0,
                         0,
                         width,
                         height,
                         fractions,
-                        shuffleColors(gColors),
+                        shuffleColorsRadnomColors(),
                         MultipleGradientPaint.CycleMethod.NO_CYCLE);
 
         backGraphic.setPaint(linearGradientPaint);
         backGraphic.fillRect(0, 0, foreground.getWidth(), foreground.getHeight());
     }
 
-    private Color chooseRandomColor() {
-        return gColors[random.nextInt(3)];
-    }
 
     /**
      * @param vertexList
@@ -161,7 +179,19 @@ public class ImageDrawServiceImpl implements ImageDrawService {
         Graphics2D g = imageWithGradient.createGraphics();
         g.drawImage(foreground, 0, 0, null);
 
-        float fractions[] = {0.0f, 0.95f, 1.0f};
+        Stroke s = new BasicStroke(15.0f,                      // Width
+                BasicStroke.CAP_SQUARE,    // End cap
+                BasicStroke.JOIN_MITER,    // Join style
+                10.0f,                     // Miter limit
+                generateStrokePattern(), // Dash pattern
+                5.0f);                     // Dash phase
+        g.setColor(new Color(255, 255, 255, 255));
+        g.setStroke(s);
+        int localRadius = radius + 25;
+        g.drawOval(point.x - localRadius, point.y - localRadius, localRadius * 2 + 5, localRadius * 2 + 5);
+
+
+        float fractions[] = {0.5f, 0.99f, 1.0f};
         Color colors[] = {
                 new Color(0, 0, 0, 255),
                 new Color(0, 0, 0, 255),
@@ -174,6 +204,20 @@ public class ImageDrawServiceImpl implements ImageDrawService {
 
         g.fillOval(point.x - radius, point.y - radius, radius * 2, radius * 2);
         g.dispose();
+    }
+
+    private float[] generateStrokePattern() {
+        final int maxSize = 20;
+        float[] result = new float[maxSize];
+        Counter.i = 0;
+        IntStream
+                .generate(() -> ThreadLocalRandom.current().nextInt(50, 200))
+                .limit(maxSize)
+                .mapToObj(value -> (float) value)
+                .forEach(floatVal -> result[Counter.i++] = floatVal);
+
+
+        return result;
     }
 
     private BufferedImage convertToARGB(BufferedImage image) {
@@ -203,6 +247,10 @@ public class ImageDrawServiceImpl implements ImageDrawService {
 
         writer.write(null, new IIOImage(img, null, metadata), param);
         writer.dispose();
+    }
+
+    static class Counter {
+        static int i = 0;
     }
 }
 
