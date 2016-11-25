@@ -32,17 +32,17 @@ public class VisionServiceStub implements VisionService {
                 .level(4).build();
         BoundingPoly boundingPoly = new BoundingPoly();
         Vertex v1 = new Vertex();
-        v1.setX(229);
-        v1.setY(417);
+        v1.setX(427);
+        v1.setY(396);
         Vertex v2 = new Vertex();
-        v2.setX(798);
-        v2.setY(417);
+        v2.setX(1592);
+        v2.setY(396);
         Vertex v3 = new Vertex();
-        v3.setX(798);
-        v3.setY(986);
+        v3.setX(1592);
+        v3.setY(1749);
         Vertex v4 = new Vertex();
-        v4.setX(229);
-        v4.setY(986);
+        v4.setX(427);
+        v4.setY(1749);
         boundingPoly.setVertices(Arrays.asList(v1, v2, v3, v4));
 
         Landmark eyes = new Landmark();

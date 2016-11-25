@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
@@ -32,7 +31,6 @@ public class ImageDrawServiceImpl implements ImageDrawService {
     private BufferedImage foreground;
     private BufferedImage imageWithGradient;
     private BufferedImage background;
-    private Random random = new Random();
 
     private Color[] gColors = new Color[]{
             new Color(66, 133, 244, 100),
@@ -148,7 +146,7 @@ public class ImageDrawServiceImpl implements ImageDrawService {
             yPos[i] = v1.getY();
         }
         int height = calculateHeight(xPos, yPos, vertexList.size());
-        return (height + 100) / 2;
+                return (height + 100) / 2;
     }
 
     /*

@@ -19,7 +19,7 @@ logging:
       springframework:
         web: INFO
 vision:
-  enabled: false
+  enabled: true
 effects:
   enabled : true
   max-colors: 2
