@@ -18,9 +18,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 
@@ -58,29 +60,41 @@ public class ImageDrawServiceImpl implements ImageDrawService {
 
             Graphics2D graphics = background.createGraphics();
 
-            FaceAnnotation faceAnnotation = visionResponse.getFaceAnnotation();
-            Position faceCenterPosition = faceAnnotation
-                    .getLandmarks()
-                    .stream()
-                    .filter(landmark ->
-                            landmark.getType().equals("MIDPOINT_BETWEEN_EYES")
-                                    || landmark.getType().equals("NOSE_TIP"))
-                    .map(Landmark::getPosition)
-                    .reduce((position, position2) -> {
-                        float x1 = position.getX();
-                        float y1 = position.getY();
-                        float x2 = position2.getX();
-                        float y2 = position2.getY();
-                        return new Position().setX((x1 + x2) / 2).setY((y1 + y2) / 2);
-                    })
-                    .get();
-
-
-            Point point = new Point((int) Math.ceil(faceCenterPosition.getX()),
-                    (int) Math.ceil(faceCenterPosition.getY() + pointDownCorrection()));
-            updateGradientAt(point, findRadius(faceAnnotation.getBoundingPoly().getVertices()));
+            java.util.List<FaceAnnotation> list = visionResponse.getFaceAnnotation();
+            java.util.List<Position> facePositions = new ArrayList<>();
+            for (FaceAnnotation faceAnnotation : list) {
+                Position faceCenterPosition = faceAnnotation
+                        .getLandmarks()
+                        .stream()
+                        .filter(landmark ->
+                                landmark.getType().equals("MIDPOINT_BETWEEN_EYES")
+                                        || landmark.getType().equals("NOSE_TIP"))
+                        .map(Landmark::getPosition)
+                        .reduce((position, position2) -> {
+                            float x1 = position.getX();
+                            float y1 = position.getY();
+                            float x2 = position2.getX();
+                            float y2 = position2.getY();
+                            return new Position().setX((x1 + x2) / 2).setY((y1 + y2) / 2);
+                        })
+                        .get();
+                facePositions.add(faceCenterPosition);
+            }
+            java.util.List<Point> points = facePositions.stream()
+                    .map(position -> new Point((int) Math.ceil(position.getX()),
+                            (int) Math.ceil(position.getY() + pointDownCorrection())))
+                    .collect(Collectors.toList());
+//            Point point = new Point((int) Math.ceil(faceCenterPosition.getX()),
+//                    (int) Math.ceil(faceCenterPosition.getY() + pointDownCorrection()));
+            java.util.List<Integer> radiuses = new ArrayList<>();
+            radiuses = list.stream()
+                    .map(faceAnnotation -> findRadius(faceAnnotation.getBoundingPoly().getVertices()))
+                    .collect(Collectors.toList());
+            updateGradientAt(points, radiuses);
             //merge
             graphics.drawImage(imageWithGradient, 0, 0, null);
+
+
             String newFilePath = filePath.toString().substring(0, filePath.toString().lastIndexOf(".jpg"));
             final File output = new File(newFilePath + "_fun.jpg");
 
@@ -146,7 +160,7 @@ public class ImageDrawServiceImpl implements ImageDrawService {
             yPos[i] = v1.getY();
         }
         int height = calculateHeight(xPos, yPos, vertexList.size());
-                return (height + 100) / 2;
+        return (height + 150) / 2;
     }
 
     /*
@@ -173,34 +187,41 @@ public class ImageDrawServiceImpl implements ImageDrawService {
         return boundsMaxY - boundsMinY;
     }
 
-    private void updateGradientAt(Point point, int radius) throws IOException {
+    private void updateGradientAt(java.util.List<Point> points, java.util.List<Integer> radiuses) throws IOException {
         Graphics2D g = imageWithGradient.createGraphics();
         g.drawImage(foreground, 0, 0, null);
-
-        Stroke s = new BasicStroke(15.0f,                      // Width
-                BasicStroke.CAP_SQUARE,    // End cap
-                BasicStroke.JOIN_MITER,    // Join style
-                10.0f,                     // Miter limit
-                generateStrokePattern(), // Dash pattern
-                5.0f);                     // Dash phase
-        g.setColor(new Color(255, 255, 255, 255));
-        g.setStroke(s);
-        int localRadius = radius + 25;
-        g.drawOval(point.x - localRadius, point.y - localRadius, localRadius * 2 + 5, localRadius * 2 + 5);
-
-
+        int i = 0;
+        final Color white = new Color(255, 255, 255, 255);
         float fractions[] = {0.5f, 0.99f, 1.0f};
         Color colors[] = {
                 new Color(0, 0, 0, 255),
                 new Color(0, 0, 0, 255),
                 new Color(0, 0, 0, 0)
         };
-        RadialGradientPaint paint =
-                new RadialGradientPaint(point, radius, fractions, colors);
-        g.setPaint(paint);
-        g.setComposite(AlphaComposite.DstOut);
+        for (Point point : points) {
+            int radius = radiuses.get(i);
+            Stroke s = new BasicStroke(15.0f,                      // Width
+                    BasicStroke.CAP_SQUARE,    // End cap
+                    BasicStroke.JOIN_MITER,    // Join style
+                    10.0f,                     // Miter limit
 
-        g.fillOval(point.x - radius, point.y - radius, radius * 2, radius * 2);
+                    generateStrokePattern(), // Dash pattern
+                    5.0f);                     // Dash phase
+            g.setColor(white);
+            g.setPaint(white);
+            g.setStroke(s);
+            int localRadius = radius + 25;
+            g.drawOval(point.x - localRadius, point.y - localRadius, localRadius * 2 + 5, localRadius * 2 + 5);
+
+
+            RadialGradientPaint paint =
+                    new RadialGradientPaint(point, radius, fractions, colors);
+            g.setPaint(paint);
+            g.setComposite(AlphaComposite.DstOut);
+
+            g.fillOval(point.x - radius, point.y - radius, radius * 2, radius * 2);
+            i++;
+        }
         g.dispose();
     }
 

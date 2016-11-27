@@ -15,7 +15,7 @@ import java.util.List;
 public class VisionResponse {
     private List<EmotionStatus> emotionsList;
     private String photoUrl;
-    private FaceAnnotation faceAnnotation;
+    private List<FaceAnnotation> faceAnnotation;
 //    private EmotionStatus sorrow;
 //    private EmotionStatus joy;
 //    private EmotionStatus suprise;

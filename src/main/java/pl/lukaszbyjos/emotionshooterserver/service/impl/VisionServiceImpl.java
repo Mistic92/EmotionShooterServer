@@ -20,6 +20,7 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 public class VisionServiceImpl implements VisionService {
@@ -46,7 +47,7 @@ public class VisionServiceImpl implements VisionService {
                             .setFeatures(ImmutableList.of(
                                     new Feature()
                                             .setType("FACE_DETECTION")
-                                            .setMaxResults(1)));
+                                            .setMaxResults(8)));
             AnnotateImageResponse response = null;
             try {
                 Vision.Images.Annotate annotate =
@@ -64,7 +65,7 @@ public class VisionServiceImpl implements VisionService {
                                     ? response.getError().getMessage()
                                     : "Unknown error getting image annotations");
                 } else {
-                    FaceAnnotation faceAnnotation = response.getFaceAnnotations().get(0);
+                    List<FaceAnnotation> faceAnnotation = response.getFaceAnnotations();
                     VisionResponse vr = VisionResponse.builder().faceAnnotation(faceAnnotation).build();
                     return setEmotionsLevels(vr);
                 }
@@ -87,7 +88,7 @@ public class VisionServiceImpl implements VisionService {
 
     private VisionResponse setEmotionsLevels(VisionResponse visionResponse) {
         if (visionResponse.getFaceAnnotation() != null) {
-            FaceAnnotation faceAnn = visionResponse.getFaceAnnotation();
+            FaceAnnotation faceAnn = visionResponse.getFaceAnnotation().get(0);
             EmotionStatus anger = EmotionStatus.builder()
                     .level(Likeness.valueOf(faceAnn.getAngerLikelihood()).getLevel())
                     .name(EmotionName.ANGER)
