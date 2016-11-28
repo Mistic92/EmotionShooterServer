@@ -60,9 +60,9 @@ public class ImageDrawServiceImpl implements ImageDrawService {
 
             Graphics2D graphics = background.createGraphics();
 
-            java.util.List<FaceAnnotation> list = visionResponse.getFaceAnnotation();
-            java.util.List<Position> facePositions = new ArrayList<>();
-            for (FaceAnnotation faceAnnotation : list) {
+            java.util.List<FaceAnnotation> faceAnnotationList = visionResponse.getFaceAnnotation();
+            java.util.List<Position> facePositions = new ArrayList<>(faceAnnotationList.size());
+            for (FaceAnnotation faceAnnotation : faceAnnotationList) {
                 Position faceCenterPosition = faceAnnotation
                         .getLandmarks()
                         .stream()
@@ -84,10 +84,8 @@ public class ImageDrawServiceImpl implements ImageDrawService {
                     .map(position -> new Point((int) Math.ceil(position.getX()),
                             (int) Math.ceil(position.getY() + pointDownCorrection())))
                     .collect(Collectors.toList());
-//            Point point = new Point((int) Math.ceil(faceCenterPosition.getX()),
-//                    (int) Math.ceil(faceCenterPosition.getY() + pointDownCorrection()));
-            java.util.List<Integer> radiuses = new ArrayList<>();
-            radiuses = list.stream()
+            java.util.List<Integer> radiuses;
+            radiuses = faceAnnotationList.stream()
                     .map(faceAnnotation -> findRadius(faceAnnotation.getBoundingPoly().getVertices()))
                     .collect(Collectors.toList());
             updateGradientAt(points, radiuses);
