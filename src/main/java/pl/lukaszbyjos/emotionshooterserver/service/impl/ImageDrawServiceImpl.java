@@ -1,9 +1,6 @@
 package pl.lukaszbyjos.emotionshooterserver.service.impl;
 
-import com.google.api.services.vision.v1.model.FaceAnnotation;
-import com.google.api.services.vision.v1.model.Landmark;
-import com.google.api.services.vision.v1.model.Position;
-import com.google.api.services.vision.v1.model.Vertex;
+import com.google.api.services.vision.v1.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,11 +11,11 @@ import javax.imageio.*;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.ThreadLocalRandom;
@@ -41,6 +38,9 @@ public class ImageDrawServiceImpl implements ImageDrawService {
             new Color(15, 157, 88, 100)};
 
     private java.util.List<Color> colorList = Arrays.asList(gColors);
+    /**
+     * Max colors which can be in shuffled array. Can't be larger than gColors array
+     */
     @Value("${effects.max-colors}")
     private int maxColorsInGradient;
 
@@ -55,41 +55,60 @@ public class ImageDrawServiceImpl implements ImageDrawService {
             imageWithGradient = convertToARGB(background);
 
             Graphics2D foregroundGraphics = foreground.createGraphics();
-
             createForegraundColors(foregroundGraphics, foreground.getWidth(), foreground.getHeight());
-
             Graphics2D graphics = background.createGraphics();
 
             java.util.List<FaceAnnotation> faceAnnotationList = visionResponse.getFaceAnnotation();
-            java.util.List<Position> facePositions = new ArrayList<>(faceAnnotationList.size());
-            for (FaceAnnotation faceAnnotation : faceAnnotationList) {
-                Position faceCenterPosition = faceAnnotation
-                        .getLandmarks()
-                        .stream()
-                        .filter(landmark ->
-                                landmark.getType().equals("MIDPOINT_BETWEEN_EYES")
-                                        || landmark.getType().equals("NOSE_TIP"))
-                        .map(Landmark::getPosition)
-                        .reduce((position, position2) -> {
-                            float x1 = position.getX();
-                            float y1 = position.getY();
-                            float x2 = position2.getX();
-                            float y2 = position2.getY();
-                            return new Position().setX((x1 + x2) / 2).setY((y1 + y2) / 2);
-                        })
-                        .get();
-                facePositions.add(faceCenterPosition);
-            }
-            java.util.List<Point> points = facePositions.stream()
-                    .map(position -> new Point((int) Math.ceil(position.getX()),
-                            (int) Math.ceil(position.getY() + pointDownCorrection())))
+
+            java.util.List<Point> points =
+                    faceAnnotationList.stream()
+                            .map(faceAnnotation -> faceAnnotation
+                                    .getLandmarks()
+                                    .stream()
+                                    .filter(landmark ->
+                                            landmark.getType().equals("MIDPOINT_BETWEEN_EYES")
+                                                    || landmark.getType().equals("NOSE_TIP"))
+                                    .map(Landmark::getPosition)
+                                    .reduce((position, position2) -> {
+                                        float x1 = position.getX();
+                                        float y1 = position.getY();
+                                        float x2 = position2.getX();
+                                        float y2 = position2.getY();
+                                        return new Position().setX((x1 + x2) / 2).setY((y1 + y2) / 2);
+                                    })
+                                    .get())
+                            .map(position -> new Point((int) Math.ceil(position.getX()),
+                                    (int) Math.ceil(position.getY())))
+                            .collect(Collectors.toList());
+
+//            for (FaceAnnotation faceAnnotation : faceAnnotationList) {
+//                Position faceCenterPosition = faceAnnotation
+//                        .getLandmarks()
+//                        .stream()
+//                        .filter(landmark ->
+//                                landmark.getType().equals("MIDPOINT_BETWEEN_EYES")
+//                                        || landmark.getType().equals("NOSE_TIP"))
+//                        .map(Landmark::getPosition)
+//                        .reduce((position, position2) -> {
+//                            float x1 = position.getX();
+//                            float y1 = position.getY();
+//                            float x2 = position2.getX();
+//                            float y2 = position2.getY();
+//                            return new Position().setX((x1 + x2) / 2).setY((y1 + y2) / 2);
+//                        })
+//                        .get();
+//                facePositions.add(faceCenterPosition);
+//            }
+
+            java.util.List<Integer> radiuses = faceAnnotationList.stream()
+                    .map(FaceAnnotation::getBoundingPoly)
+                    .map(BoundingPoly::getVertices)
+                    .map(this::findRadius)
                     .collect(Collectors.toList());
-            java.util.List<Integer> radiuses;
-            radiuses = faceAnnotationList.stream()
-                    .map(faceAnnotation -> findRadius(faceAnnotation.getBoundingPoly().getVertices()))
-                    .collect(Collectors.toList());
+
             updateGradientAt(points, radiuses);
-            //merge
+
+            //merge images
             graphics.drawImage(imageWithGradient, 0, 0, null);
 
 
@@ -104,10 +123,12 @@ public class ImageDrawServiceImpl implements ImageDrawService {
         return null;
     }
 
-    private int pointDownCorrection() {
-        return 0;
-    }
 
+    /**
+     * Shuffle color array and return new with size defined by maxColorsInGradient
+     *
+     * @return
+     */
     private Color[] shuffleColorsRadnomColors() {
         Collections.shuffle(colorList);
         return colorList.stream().limit(maxColorsInGradient).toArray(Color[]::new);
@@ -128,7 +149,13 @@ public class ImageDrawServiceImpl implements ImageDrawService {
         }
     }
 
-
+    /**
+     * Creates foreground gradient
+     *
+     * @param backGraphic
+     * @param width
+     * @param height
+     */
     private void createForegraundColors(Graphics2D backGraphic, int width, int height) {
         float fractions[] = getFractionsForColors();
         LinearGradientPaint linearGradientPaint =
